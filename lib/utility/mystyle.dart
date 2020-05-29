@@ -4,6 +4,12 @@ class MyStyle {
   Color darkColor = Colors.blue.shade700;
   Color primaryColor = Colors.green;
 
+  Container myProgressMap() {
+    return Container(
+      child: CircularProgressIndicator(),
+    );
+  }
+
   SizedBox mySizedBox() => SizedBox(
         height: 16.0,
         width: 8.0,

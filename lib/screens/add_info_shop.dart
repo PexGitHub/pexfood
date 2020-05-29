@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:pexfood/utility/mystyle.dart';
 
 class AddInfoShop extends StatefulWidget {
@@ -8,6 +9,31 @@ class AddInfoShop extends StatefulWidget {
 }
 
 class _AddInfoShopState extends State<AddInfoShop> {
+  double lat, lng;
+  @override
+  void initState() {
+    super.initState();
+    findLatLng();
+  }
+
+  Future<Null> findLatLng() async {
+    LocationData locationData = await findLocation();
+    setState(() {
+      lat = locationData.latitude;
+      lng = locationData.longitude;
+    });
+    print('lat = $lat  , lng = $lng');
+  }
+
+  Future<LocationData> findLocation() async {
+    Location location = Location();
+    try {
+      return location.getLocation();
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +52,7 @@ class _AddInfoShopState extends State<AddInfoShop> {
             MyStyle().mySizedBox(),
             groupImage(),
             MyStyle().mySizedBox(),
-            showMap(),
+            lat == null ? MyStyle().myProgressMap() : showMap(),
             MyStyle().mySizedBox(),
             saveButton()
           ],
@@ -53,13 +79,25 @@ class _AddInfoShopState extends State<AddInfoShop> {
     );
   }
 
+  Set<Marker> myMarker() {
+    return <Marker>[
+      Marker(
+        markerId: MarkerId('myShop'),
+        position: LatLng(lat, lng),
+        infoWindow: InfoWindow(
+            title: 'SSP Tower', snippet: 'ละติจูด = $lat , ลองติจูด = $lng'),
+      )
+    ].toSet();
+  }
+
   Container showMap() {
-    LatLng latLng = LatLng(13.640912, 100.591377);
+    LatLng latLng = LatLng(lat, lng);
     CameraPosition cameraPosition = CameraPosition(target: latLng, zoom: 16.0);
 
     return Container(
         height: 300.0,
         child: GoogleMap(
+          markers: myMarker(),
           initialCameraPosition: cameraPosition,
           mapType: MapType.normal,
           onMapCreated: (controller) {},
