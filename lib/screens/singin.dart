@@ -6,6 +6,7 @@ import 'package:pexfood/model/user_model.dart';
 import 'package:pexfood/screens/main_rider.dart';
 import 'package:pexfood/screens/main_shop.dart';
 import 'package:pexfood/screens/main_user.dart';
+import 'package:pexfood/utility/myconstant.dart';
 import 'package:pexfood/utility/mystyle.dart';
 import 'package:pexfood/utility/normal_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,7 +56,7 @@ class _SingInState extends State<SingIn> {
 
   Future<Null> checkAuthen() async {
     String url =
-        'http://192.168.0.107:81/pexfood/getuserwhereuser.php?isAdd=true&User=$user';
+        '${MyConstant().domain}/pexfood/getuserwhereuser.php?isAdd=true&User=$user';
     try {
       Response response = await Dio().get(url);
       print('res = $response');

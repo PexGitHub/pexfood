@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:pexfood/utility/myconstant.dart';
 import 'package:pexfood/utility/mystyle.dart';
 import 'package:pexfood/utility/normal_dialog.dart';
 
@@ -43,7 +44,7 @@ class _SingUpState extends State<SingUp> {
 
   Future<Null> checkUser() async {
     String url =
-        'http://192.168.0.107:81/pexfood/getUserWhereUser.php?isAdd=true&User=$user';
+        '${MyConstant().domain}/pexfood/getUserWhereUser.php?isAdd=true&User=$user';
     try {
       Response response = await Dio().get(url);
       if (response.toString() == 'null') {
@@ -57,7 +58,7 @@ class _SingUpState extends State<SingUp> {
 
   Future<Null> registerThread() async {
     String url =
-        'http://192.168.0.107:81/pexfood/addData.php?isAdd=true&name=$name&user=$user&password=$password&type=$chooseType';
+        '${MyConstant().domain}/pexfood/addData.php?isAdd=true&name=$name&user=$user&password=$password&type=$chooseType';
     try {
       Response response = await Dio().get(url);
       print('res = $response');
