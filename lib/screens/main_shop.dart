@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pexfood/utility/mystyle.dart';
 import 'package:pexfood/utility/singOutProcess.dart';
-import 'package:pexfood/widget/food_list_shop.dart';
+import 'package:pexfood/widget/list_food_menu_shop.dart';
 import 'package:pexfood/widget/infomation_shop.dart';
 import 'package:pexfood/widget/order_list_shop.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,7 +76,7 @@ class _MainShopState extends State<MainShop> {
       subtitle: Text('รายการอาหาร ของร้าน'),
       onTap: () {
         setState(() {
-          currentWidget = FoodListShop();
+          currentWidget = ListFoodMenuShop();
           Navigator.pop(context);
         });
       },

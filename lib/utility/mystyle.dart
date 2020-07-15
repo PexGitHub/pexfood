@@ -4,8 +4,8 @@ class MyStyle {
   Color darkColor = Colors.blue.shade700;
   Color primaryColor = Colors.green;
 
-  Container myProgressMap() {
-    return Container(
+  Widget myProgressMap() {
+    return Center(
       child: CircularProgressIndicator(),
     );
   }
@@ -26,6 +26,16 @@ class MyStyle {
         style: TextStyle(
             fontSize: 18.0, color: darkColor, fontWeight: FontWeight.bold),
       );
+      Text showTitle3(String title) => Text(
+        title,
+        style: TextStyle(
+            fontSize: 16.0, color: darkColor, fontWeight: FontWeight.bold),
+      );
+  TextStyle mainTitle = TextStyle(
+      fontSize: 16.0, color: Colors.blue, fontWeight: FontWeight.bold);
+  TextStyle mainTitle2 = TextStyle(
+      fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold);
+      
   Center titleCenter(BuildContext context, String string) {
     return Center(
       child: Container(

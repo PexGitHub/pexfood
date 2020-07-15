@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pexfood/model/user_model.dart';
 import 'package:pexfood/screens/add_info_shop.dart';
+import 'package:pexfood/screens/edit_info_shop.dart';
 import 'package:pexfood/utility/myconstant.dart';
 import 'package:pexfood/utility/mystyle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,10 +55,71 @@ class _InformationShopState extends State<InformationShop> {
             ? MyStyle().myProgressMap()
             : userModel.nameshop.isEmpty
                 ? showNoData(context)
-                : Text('Have   Data'),
+                : showListInfoShop(),
         addeditButton(),
       ],
     );
+  }
+
+  Widget showListInfoShop() => Column(
+        children: <Widget>[
+          MyStyle().showTitle2('รายละเอียดร้าน ${userModel.nameshop}'),
+          showImageShop(),
+          Row(
+            children: <Widget>[
+              MyStyle().showTitle2('ที่อยู่ของร้าน'),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Text(userModel.address),
+            ],
+          ),
+          MyStyle().mySizedBox(),
+          showMapShop(),
+        ],
+      );
+
+  Widget showMapShop() {
+    double lat = double.parse(userModel.lat);
+    double lng = double.parse(userModel.lng);
+
+    LatLng latLng = LatLng(lat, lng);
+    CameraPosition position = CameraPosition(target: latLng, zoom: 16.0);
+
+    print(lng);
+    return Expanded(
+      //padding: EdgeInsets.all(10.0),
+      // height: 300.0,
+      child: GoogleMap(
+        initialCameraPosition: position,
+        mapType: MapType.normal,
+        onMapCreated: (controller) {},
+        markers: showMarker(),
+      ),
+    );
+  }
+
+  Set<Marker> showMarker() {
+    return <Marker>[
+      Marker(
+        markerId: MarkerId('shopId'),
+        position:
+            LatLng(double.parse(userModel.lat), double.parse(userModel.lng)),
+        infoWindow: InfoWindow(
+            title: 'ตำแหน่งร้าน',
+            snippet:
+                'ละติจูด = ${userModel.lat} , ลองติจูด = ${userModel.lng}'),
+      )
+    ].toSet();
+  }
+
+  Container showImageShop() {
+    return Container(
+        padding: EdgeInsets.all(10.0),
+        width: 220.0,
+        height: 220.0,
+        child: Image.network('${MyConstant().domain}${userModel.urlpicture}'));
   }
 
   Widget showNoData(BuildContext context) {
@@ -84,8 +147,8 @@ class _InformationShopState extends State<InformationShop> {
   }
 
   void routeToAddInfo() {
-    MaterialPageRoute route =
-        MaterialPageRoute(builder: (context) => AddInfoShop());
-    Navigator.of(context).push(route);
+    Widget widget = userModel.nameshop.isEmpty ? AddInfoShop() : EditInfoShop();
+    MaterialPageRoute route = MaterialPageRoute(builder: (context) => widget);
+    Navigator.of(context).push(route).then((value) => readDataUser());
   }
 }
