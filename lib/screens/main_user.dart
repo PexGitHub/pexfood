@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pexfood/screens/show_cart.dart';
 import 'package:pexfood/utility/mystyle.dart';
 import 'package:pexfood/utility/singOutProcess.dart';
 import 'package:pexfood/widget/show_list_shop_all.dart';
@@ -36,6 +37,7 @@ class _MainUserState extends State<MainUser> {
       appBar: AppBar(
         title: Text(nameUser == null ? 'Main User' : 'Login By $nameUser'),
         actions: <Widget>[
+          MyStyle().iconShowCart(context),
           IconButton(
               icon: Icon(Icons.exit_to_app),
               onPressed: () => singoOutProcess(context)),
@@ -52,6 +54,7 @@ class _MainUserState extends State<MainUser> {
               children: <Widget>[
                 showHeadDrawer(),
                 menuListShop(),
+                menuCart(),
                 menuStatusFoodOrder(),
               ],
             ),
@@ -130,5 +133,19 @@ class _MainUserState extends State<MainUser> {
           'Login',
           style: TextStyle(color: MyStyle().primaryColor),
         ));
+  }
+
+  Widget menuCart() {
+    return ListTile(
+      leading: Icon(Icons.add_shopping_cart),
+      title: Text('ตะกร้าของฉัน'),
+      subtitle: Text('รายการอาหารที่อยู่ในตะกร้า ยังไม่ได้ Order'),
+      onTap: () {
+        Navigator.pop(context);
+        MaterialPageRoute route =
+            MaterialPageRoute(builder: (context) => ShowCart());
+        Navigator.push(context, route);
+      },
+    );
   }
 }
