@@ -1,7 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pexfood/model/cart_model.dart';
+import 'package:pexfood/utility/myconstant.dart';
 import 'package:pexfood/utility/mystyle.dart';
+import 'package:pexfood/utility/normal_dialog.dart';
 import 'package:pexfood/utility/sqlite_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 
 class ShowCart extends StatefulWidget {
   @override
@@ -15,7 +21,6 @@ class _ShowCartState extends State<ShowCart> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     readSQLite();
   }
@@ -61,7 +66,8 @@ class _ShowCartState extends State<ShowCart> {
             buildListFood(),
             Divider(),
             buildTotal(),
-            buildClearCartButton()
+            buildClearCartButton(),
+            buildOrderButton(),
           ],
         ),
       ),
@@ -72,21 +78,50 @@ class _ShowCartState extends State<ShowCart> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        RaisedButton.icon(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0)),
-            color: MyStyle().primaryColor,
-            onPressed: () {
-              confirmDeleteAllData();
-            },
-            icon: Icon(
-              Icons.delete_outline,
-              color: Colors.white,
-            ),
-            label: Text(
-              'เคลียร์ตะกร้า',
-              style: TextStyle(color: Colors.white),
-            )),
+        Container(
+          width: 150,
+          child: RaisedButton.icon(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)),
+              color: MyStyle().primaryColor,
+              onPressed: () {
+                confirmDeleteAllData();
+              },
+              icon: Icon(
+                Icons.delete_outline,
+                color: Colors.white,
+              ),
+              label: Text(
+                'เคลียร์ตะกร้า',
+                style: TextStyle(color: Colors.white),
+              )),
+        ),
+      ],
+    );
+  }
+
+  Widget buildOrderButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        Container(
+          width: 150,
+          child: RaisedButton.icon(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)),
+              color: MyStyle().darkColor,
+              onPressed: () {
+                orderThread();
+              },
+              icon: Icon(
+                Icons.fastfood,
+                color: Colors.white,
+              ),
+              label: Text(
+                'Order',
+                style: TextStyle(color: Colors.white),
+              )),
+        ),
       ],
     );
   }
@@ -227,5 +262,62 @@ class _ShowCartState extends State<ShowCart> {
             ),
           ]),
     );
+  }
+
+  Future<Null> orderThread() async {
+    DateTime dateTime = DateTime.now();
+    String orderDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+    String idShop = cartModels[0].idShop;
+    String nameShop = cartModels[0].nameShop;
+    String distance = cartModels[0].distance;
+    String transport = cartModels[0].transport;
+    List<String> idFoods = List();
+    List<String> nameFoods = List();
+    List<String> prices = List();
+    List<String> amounts = List();
+    List<String> sums = List();
+
+    for (var model in cartModels) {
+      idFoods.add(model.idFood);
+      nameFoods.add(model.nameFood);
+      prices.add(model.price);
+      amounts.add(model.amount);
+      sums.add(model.sum);
+    }
+    String idFood = idFoods.toString();
+    String nameFood = nameFoods.toString();
+    String price = prices.toString();
+    String amount = amounts.toString();
+    String sum = sums.toString();
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String idUser = preferences.getString('id');
+    String nameUser = preferences.getString('name');
+
+    print(
+        '$orderDateTime $idUser $nameUser $idShop $nameShop $distance $transport');
+    print('$idFood $nameFoods $prices $amounts $sums');
+
+    String url =
+        '${MyConstant().domain}/pexfood/addOrder.php?isAdd=true&orderDateTime=$orderDateTime&idUser=$idUser&nameUser=$nameUser&idShop=$idShop&nameShop=$nameShop&distance=$distance&transport=$transport&idFood=$idFood&nameFood=$nameFood&price=$price&amount=$amount&sum=$sum&idRider=none&status=UserOrder';
+
+    await Dio().get(url).then((value) {
+      if (value.toString() == 'true') {
+        clearAllSQLite();
+      } else {
+        normalDialog(context, 'ไม่สามารถ order ได้ กรุณาลองใหม่');
+      }
+    });
+  }
+
+  Future<Null> clearAllSQLite() async {
+    Toast.show(
+      'Order เรียบร้อยแล้ว',
+      context,
+      duration: Toast.LENGTH_LONG,
+    );
+    await SQLiteHelper().deleteAllData().then((value) {
+      readSQLite();
+    });
   }
 }
